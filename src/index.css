@@ -38,8 +38,8 @@ html {
   /* rest of the colors */
   --black: #222;
   --white: #fff;
-  --red-light: #f8d7da;
-  --red-dark: #842029;
+  --red-light: #ff6a76;
+  --red-dark: #c00616;
   --green-light: #d1e7dd;
   --green-dark: #0f5132;
 
@@ -196,7 +196,7 @@ ul {
 }
 
 .alert-danger {
-  color: var(--red-dark);
+  color: var(--primary-50);
   background: var(--red-light);
 }
 .alert-success {
