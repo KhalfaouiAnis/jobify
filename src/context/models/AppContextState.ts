@@ -1,5 +1,6 @@
 import User from "../../interfaces/User";
 import { ReactNode } from "react";
+import Auth from "../../interfaces/Auth";
 
 export interface AppContextState {
   isLoading: boolean;
@@ -7,11 +8,14 @@ export interface AppContextState {
   alertText: string;
   alertType: "" | "success" | "error" | "info" | "warning";
   displayAlert(): void;
-  registerUser(user: User): void;
-  user: User | null | undefined | {};
+  authUser(object: Auth): void;
+  toggleSidebar(): void;
+  logoutUser(): void;
+  user: User | null | undefined;
   token: string;
   userLocation: string;
   jobLocation: string;
+  showSidebar: boolean;
 }
 
 export interface AppContextProps {

@@ -12,14 +12,14 @@ const initialState = {
   isMember: false,
 };
 
-const Register = () => {
+const Auth = () => {
   const navigate = useNavigate();
   const [values, setValues] = useState(initialState);
   const {
     isLoading,
     showAlert,
     displayAlert,
-    registerUser,
+    authUser,
     user,
   } = useAppContext();
 
@@ -37,11 +37,20 @@ const Register = () => {
     if (!email || !password || (!isMember && !name)) {
       displayAlert();
     }
-    const currentUser: User = { name, email, password };
     if (isMember) {
-      console.log("login");
+      const currentUser: User = { email, password };
+      authUser({
+        currentUser,
+        endPoint: "login",
+        alertText: "Login successful! redirecting...",
+      });
     } else {
-      registerUser(currentUser);
+      const currentUser: User = { name, email, password };
+      authUser({
+        currentUser,
+        endPoint: "register",
+        alertText: "Account created! redirecting...",
+      });
     }
   };
 
@@ -99,4 +108,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Auth;

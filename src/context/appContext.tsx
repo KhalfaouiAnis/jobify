@@ -2,16 +2,21 @@ import React, { useReducer, useContext, Fragment } from "react";
 import axios from "axios";
 import reducer from "./reducers";
 import { AppContextState, AppContextProps } from "./models";
-import { saveUserToLocalStorage } from "../utils/localStorage";
+import {
+  saveUserToLocalStorage,
+  removeUserFromLocalStorage,
+} from "../utils/localStorage";
 import {
   DISPLAY_ALERT,
   CLEAR_ALERT,
-  REGISTER_USER_BEGIN,
-  REGISTER_USER_SUCCESS,
-  REGISTER_USER_ERROR,
+  AUTH_USER_BEGIN,
+  AUTH_USER_SUCCESS,
+  AUTH_USER_ERROR,
+  TOGGLE_SIDEBAR,
+  LOGOUT_USER,
 } from "./actions";
-import User from "../interfaces/User";
 import { API_VERSION } from "../shared/url";
+import Auth from "../interfaces/Auth";
 
 const token = localStorage.getItem("token");
 const user = localStorage.getItem("user");
@@ -23,11 +28,14 @@ const initialState: AppContextState = {
   alertText: "",
   alertType: "",
   displayAlert: () => {},
-  registerUser: () => {},
+  authUser: () => {},
+  toggleSidebar: () => {},
+  logoutUser: () => {},
   user: user ? JSON.parse(user) : null,
   token: token || "",
   userLocation: userLocation || "",
   jobLocation: userLocation || "",
+  showSidebar: false,
 };
 
 const AppContext = React.createContext(initialState);
@@ -46,31 +54,42 @@ const AppProvider = ({ children }: AppContextProps) => {
     }, 3000);
   };
 
-  const registerUser = async (currentUser: User) => {
-    dispatch({ type: REGISTER_USER_BEGIN });
+  const authUser = async ({ currentUser, endPoint, alertText }: Auth) => {
+    dispatch({ type: AUTH_USER_BEGIN });
     try {
-      const response = await axios.post(
-        `/api/v${API_VERSION}/auth/register`,
+      const { data } = await axios.post(
+        `/api/v${API_VERSION}/auth/${endPoint}`,
         currentUser
       );
-      const { user, token, location } = response.data;
+      const { user, token, location } = data;
       dispatch({
-        type: REGISTER_USER_SUCCESS,
-        payload: { user, token, location },
+        type: AUTH_USER_SUCCESS,
+        payload: { user, token, location, alertText },
       });
       saveUserToLocalStorage({ user, token, location });
     } catch (error) {
       //console.log(error.response);
       dispatch({
-        type: REGISTER_USER_ERROR,
+        type: AUTH_USER_ERROR,
         payload: { message: error.response.data.message },
       });
     }
     clearAlert();
   };
 
+  const toggleSidebar = () => {
+    dispatch({ type: TOGGLE_SIDEBAR });
+  };
+
+  const logoutUser = () => {
+    dispatch({ type: LOGOUT_USER });
+    removeUserFromLocalStorage();
+  };
+
   return (
-    <AppContext.Provider value={{ ...state, displayAlert, registerUser }}>
+    <AppContext.Provider
+      value={{ ...state, displayAlert, authUser, toggleSidebar, logoutUser }}
+    >
       {children}
     </AppContext.Provider>
   );
