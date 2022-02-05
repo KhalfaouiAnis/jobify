@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Main from "../assets/images/main-alternative.svg";
 import Wrapper from "../assets/wrappers/LandingPage";
 import { Logo } from "../components";
@@ -20,7 +21,9 @@ const Landing = () => {
             typeface without relying on meaningful content. Lorem ipsum may be
             used as a placeholder before the final copy is available
           </p>
-          <button className="btn tbn-hero">Login/Register</button>
+          <Link to="/auth" className="btn tbn-hero">
+            Login/Register
+          </Link>
         </div>
         <img src={Main} alt="Main" className="img main-img" />
       </div>

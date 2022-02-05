@@ -39,6 +39,7 @@ html {
   --black: #222;
   --white: #fff;
   --red-light: #ff6a76;
+  --orange-light: #ffa06a;
   --red-dark: #c00616;
   --green-light: #d1e7dd;
   --green-dark: #0f5132;
@@ -202,6 +203,14 @@ ul {
 .alert-success {
   color: var(--green-dark);
   background: var(--green-light);
+}
+.alert-warning {
+  color: var(--orange-light);
+  background: var(--grey-900);
+}
+.alert-info {
+  color: var(--primary-800);
+  background: var(--grey-50);
 }
 /* form */
 

@@ -42,14 +42,14 @@ const Auth = () => {
       authUser({
         currentUser,
         endPoint: "login",
-        alertText: "Login successful! redirecting...",
+        alertText: "Login successful ! redirecting...",
       });
     } else {
       const currentUser: User = { name, email, password };
       authUser({
         currentUser,
         endPoint: "register",
-        alertText: "Account created! redirecting...",
+        alertText: "Account created ! redirecting...",
       });
     }
   };
@@ -58,7 +58,7 @@ const Auth = () => {
     if (user) {
       setTimeout(() => {
         navigate("/");
-      }, 1500);
+      }, 500);
     }
   }, [user, navigate]);
 

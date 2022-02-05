@@ -1,11 +1,11 @@
 import React, { ReactElement } from "react";
 
 interface formRowProps {
-  type: string;
-  name: string;
-  value: string | number;
-  handleChange(e: React.SyntheticEvent): void;
-  labelText: string;
+  type?: string;
+  name?: string;
+  value?: string | number;
+  handleChange?(e: React.SyntheticEvent): any;
+  labelText?: string;
 }
 
 const FormRow = ({

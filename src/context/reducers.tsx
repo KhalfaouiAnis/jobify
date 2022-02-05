@@ -7,6 +7,14 @@ import {
   AUTH_USER_ERROR,
   TOGGLE_SIDEBAR,
   LOGOUT_USER,
+  UPDATE_USER_BEGIN,
+  UPDATE_USER_SUCCESS,
+  UPDATE_USER_ERROR,
+  HANDLE_CHANGE,
+  CLEAR_VALUES,
+  CREATE_JOB_BEGIN,
+  CREATE_JOB_SUCCESS,
+  CREATE_JOB_ERROR,
 } from "./actions";
 
 import { initialState } from "./appContext";
@@ -19,8 +27,8 @@ const reducer = (
     return {
       ...state,
       showAlert: true,
-      alertType: "error",
-      alertText: "Please add all values",
+      alertType: "danger",
+      alertText: "Please provide all values",
     };
   }
   if (action.type === CLEAR_ALERT) {
@@ -31,7 +39,7 @@ const reducer = (
       alertText: "",
     };
   }
-  if (action.type === AUTH_USER_BEGIN) {
+  if (action.type === AUTH_USER_BEGIN || action.type === UPDATE_USER_BEGIN) {
     return {
       ...state,
       isLoading: true,
@@ -50,12 +58,12 @@ const reducer = (
       alertText: action.payload.alertText,
     };
   }
-  if (action.type === AUTH_USER_ERROR) {
+  if (action.type === AUTH_USER_ERROR || action.type === UPDATE_USER_ERROR) {
     return {
       ...state,
       isLoading: false,
       showAlert: true,
-      alertType: "error",
+      alertType: "danger",
       alertText: action.payload.message,
     };
   }
@@ -73,6 +81,87 @@ const reducer = (
       jobLocation: "",
       userLocation: "",
       showSidebar: !state.showSidebar,
+    };
+  }
+
+  if (action.type === UPDATE_USER_BEGIN) {
+    return {
+      ...state,
+      isLoading: true,
+    };
+  }
+
+  if (action.type === UPDATE_USER_SUCCESS) {
+    return {
+      ...state,
+      isLoading: false,
+      token: action.payload.token,
+      user: action.payload.user,
+      userLocation: action.payload.location,
+      jobLocation: action.payload.location,
+      showAlert: true,
+      alertType: "success",
+      alertText: "User profile updated",
+    };
+  }
+
+  if (action.type === UPDATE_USER_ERROR) {
+    return {
+      ...state,
+      isLoading: false,
+      showAlert: true,
+      alertType: "danger",
+      alertText: action.payload.message,
+    };
+  }
+
+  if (action.type === HANDLE_CHANGE) {
+    return {
+      ...state,
+      [action.payload.name]: action.payload.value,
+    };
+  }
+
+  if (action.type === CLEAR_VALUES) {
+    const initialState = {
+      isEditing: false,
+      editJobId: "",
+      position: "",
+      company: "",
+      jobLocation: state.userLocation || "",
+      jobType: "full-time",
+      status: "pending",
+    };
+    return {
+      ...state,
+      ...initialState,
+    };
+  }
+
+  if (action.type === CREATE_JOB_BEGIN) {
+    return {
+      ...state,
+      isLoading: true,
+    };
+  }
+
+  if (action.type === CREATE_JOB_SUCCESS) {
+    return {
+      ...state,
+      isLoading: false,
+      showAlert: true,
+      alertType: "success",
+      alertText: "New job created",
+    };
+  }
+
+  if (action.type === CREATE_JOB_ERROR) {
+    return {
+      ...state,
+      isLoading: false,
+      showAlert: true,
+      alertType: "danger",
+      alertText: action.payload.message,
     };
   }
   throw new Error(`No such action: ${action.type}`);
