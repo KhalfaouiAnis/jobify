@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { Landing, Auth, Error, ProtectedRoute } from "./pages";
@@ -9,10 +9,34 @@ import {
   Stats,
   SharedLayout,
 } from "./pages/dashboard";
+import ConfirmDialog from "./components/notifications/ConfirmDialog";
+import useConfirm from "./hooks/useConfirm";
 
 function App() {
+  const { confirm } = useConfirm();
+  const [message, setMessage] = useState("");
+
+  const showConfirm = async () => {
+    const isConfirmed = await confirm("Do you confirm your choice?");
+
+    if (isConfirmed) {
+      setMessage("Confirmed!");
+    } else {
+      setMessage("Declined.");
+    }
+  };
+
   return (
     <BrowserRouter>
+      {/* <div className="app">
+        <div>
+          <button className="portal-btn" onClick={showConfirm}>
+            Show confirm
+          </button>
+        </div>
+        <p>{message}</p>
+      </div>
+      <ConfirmDialog /> */}
       <Routes>
         <Route
           path="/"

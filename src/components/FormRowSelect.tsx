@@ -1,6 +1,6 @@
 import React, { ReactElement } from "react";
 
-interface FormRowSelect {
+interface FormRowSelectProps {
   type?: string;
   name?: string;
   value?: string | number;
@@ -15,7 +15,7 @@ const FormRowSelect = ({
   handleChange,
   labelText,
   list,
-}: FormRowSelect): ReactElement => {
+}: FormRowSelectProps): ReactElement => {
   return (
     <div className="form-row">
       <label htmlFor={name} className="form-label">

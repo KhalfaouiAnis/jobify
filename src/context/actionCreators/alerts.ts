@@ -1,12 +1,12 @@
-import { DISPLAY_ALERT, CLEAR_ALERT } from "../actions";
+import actionTypes from "../actionTypes";
 
 export const displayAlert = (dispatch: any) => {
-  dispatch({ type: DISPLAY_ALERT });
+  dispatch({ type: actionTypes.DISPLAY_ALERT });
   clearAlert(dispatch);
 };
 
 export const clearAlert = (dispatch: any) => {
   setTimeout(() => {
-    dispatch({ type: CLEAR_ALERT });
+    dispatch({ type: actionTypes.CLEAR_ALERT });
   }, 3000);
 };

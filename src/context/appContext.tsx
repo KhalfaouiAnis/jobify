@@ -1,31 +1,19 @@
 import React, { useReducer, useContext, Fragment } from "react";
-import axios from "axios";
+import axios, { HeadersDefaults } from "axios";
 import reducer from "./reducers";
 import { AppContextState, AppContextProps, HCProps } from "./models";
+import actionTypes from "./actionTypes";
 import {
   saveUserToLocalStorage,
   removeUserFromLocalStorage,
 } from "../utils/localStorage";
-import {
-  DISPLAY_ALERT,
-  CLEAR_ALERT,
-  AUTH_USER_BEGIN,
-  AUTH_USER_SUCCESS,
-  AUTH_USER_ERROR,
-  TOGGLE_SIDEBAR,
-  LOGOUT_USER,
-  UPDATE_USER_BEGIN,
-  UPDATE_USER_SUCCESS,
-  UPDATE_USER_ERROR,
-  HANDLE_CHANGE,
-  CLEAR_VALUES,
-  CREATE_JOB_BEGIN,
-  CREATE_JOB_SUCCESS,
-  CREATE_JOB_ERROR,
-} from "./actions";
 import { API_VERSION } from "../shared/url";
 import Auth from "../interfaces/Auth";
 import User from "../interfaces/User";
+
+interface CommonHeaderProperties extends HeadersDefaults {
+  Authorization: string;
+}
 
 const token = localStorage.getItem("token");
 const user = localStorage.getItem("user");
@@ -42,7 +30,7 @@ const initialState: AppContextState = {
   logoutUser: () => {},
   updateUser: () => {},
   user: user ? JSON.parse(user) : null,
-  token: token,
+  token: token || "",
   userLocation: userLocation || "",
   showSidebar: false,
 
@@ -56,6 +44,26 @@ const initialState: AppContextState = {
   jobType: "full-time",
   statusOptions: ["interview", "declined", "pending", "approuved"],
   status: "pending",
+
+  //Job context: get jobs
+  jobs: [],
+  totalJobs: 0,
+  numOfPages: 1,
+  page: 1,
+  stats: {},
+  monthlyApplications: [],
+  search: "",
+  searchStatus: "all",
+  searchType: "all",
+  sort: "latest",
+  sortOptions: ["latest", "oldest", "a-z", "z-a"],
+  getJobs: () => {},
+  setEditJob: () => {},
+  editJob: () => {},
+  deleteJob: () => {},
+  showStats: () => {},
+  clearFilters: () => {},
+  changePage: () => {},
 
   handleChange: () => {},
   clearValues: () => {},
@@ -79,14 +87,14 @@ const AppProvider = ({ children }: AppContextProps) => {
 
   //request
   // authFetch.interceptors.request.use(
-  //   async (config: AxiosRequestConfig) => {
+  //   async (config) => {
   //     if (config.headers === undefined) {
   //       config.headers = {};
-  //     }
-  //     if (token) {
-  //       config.headers["Authorization"] = `Bearer ${token}`;
-  //     } else {
-  //       delete config.headers["Authorization"];
+  //       if (state.token) {
+  //         config.headers["Authorization"] = `Bearer ${state.token}`;
+  //       } else {
+  //         //delete config.headers["Authorization"];
+  //       }
   //     }
   //     return config;
   //   },
@@ -109,18 +117,18 @@ const AppProvider = ({ children }: AppContextProps) => {
   );
 
   const displayAlert = () => {
-    dispatch({ type: DISPLAY_ALERT });
+    dispatch({ type: actionTypes.DISPLAY_ALERT });
     clearAlert();
   };
 
   const clearAlert = () => {
     setTimeout(() => {
-      dispatch({ type: CLEAR_ALERT });
+      dispatch({ type: actionTypes.CLEAR_ALERT });
     }, 3000);
   };
 
   const authUser = async ({ currentUser, endPoint, alertText }: Auth) => {
-    dispatch({ type: AUTH_USER_BEGIN });
+    dispatch({ type: actionTypes.AUTH_USER_BEGIN });
     try {
       const { data } = await axios.post(
         `/api/v${API_VERSION}/auth/${endPoint}`,
@@ -128,13 +136,13 @@ const AppProvider = ({ children }: AppContextProps) => {
       );
       const { user, token, location } = data;
       dispatch({
-        type: AUTH_USER_SUCCESS,
+        type: actionTypes.AUTH_USER_SUCCESS,
         payload: { user, token, location, alertText },
       });
       saveUserToLocalStorage({ user, token, location });
     } catch (error) {
       dispatch({
-        type: AUTH_USER_ERROR,
+        type: actionTypes.AUTH_USER_ERROR,
         payload: { message: error.response.data.message },
       });
     }
@@ -142,29 +150,28 @@ const AppProvider = ({ children }: AppContextProps) => {
   };
 
   const toggleSidebar = () => {
-    dispatch({ type: TOGGLE_SIDEBAR });
+    dispatch({ type: actionTypes.TOGGLE_SIDEBAR });
   };
 
   const logoutUser = () => {
-    dispatch({ type: LOGOUT_USER });
+    dispatch({ type: actionTypes.LOGOUT_USER });
     removeUserFromLocalStorage();
   };
 
   const updateUser = async (currentUser: User) => {
-    dispatch({ type: UPDATE_USER_BEGIN });
+    dispatch({ type: actionTypes.UPDATE_USER_BEGIN });
     try {
       const { data } = await authFetch.patch(`/auth/updateUser`, currentUser);
       const { user, location, token } = data;
       dispatch({
-        type: UPDATE_USER_SUCCESS,
+        type: actionTypes.UPDATE_USER_SUCCESS,
         payload: { user, location, token },
       });
       saveUserToLocalStorage({ user, location, token });
     } catch (error) {
-      console.log("error update: ", error);
       if (error.response.status !== 401) {
         dispatch({
-          type: UPDATE_USER_ERROR,
+          type: actionTypes.UPDATE_USER_ERROR,
           payload: { message: error.response.data.message },
         });
       }
@@ -173,15 +180,15 @@ const AppProvider = ({ children }: AppContextProps) => {
   };
 
   const handleChange = ({ name, value }: HCProps) => {
-    dispatch({ type: HANDLE_CHANGE, payload: { name, value } });
+    dispatch({ type: actionTypes.HANDLE_CHANGE, payload: { name, value } });
   };
 
   const clearValues = () => {
-    dispatch({ type: CLEAR_VALUES });
+    dispatch({ type: actionTypes.CLEAR_VALUES });
   };
 
   const createJob = async () => {
-    dispatch({ type: CREATE_JOB_BEGIN });
+    dispatch({ type: actionTypes.CREATE_JOB_BEGIN });
     try {
       const { position, company, jobLocation, jobType, status } = state;
       await authFetch.post(`/jobs/`, {
@@ -191,16 +198,112 @@ const AppProvider = ({ children }: AppContextProps) => {
         jobType,
         status,
       });
-      dispatch({ type: CREATE_JOB_SUCCESS });
-      dispatch({ type: CLEAR_VALUES });
+      dispatch({ type: actionTypes.CREATE_JOB_SUCCESS });
+      dispatch({ type: actionTypes.CLEAR_VALUES });
     } catch (error) {
       if (error.response.status === 401) return;
       dispatch({
-        type: CREATE_JOB_ERROR,
+        type: actionTypes.CREATE_JOB_ERROR,
         payload: { message: error.response.data.message },
       });
     }
     clearAlert();
+  };
+
+  const getJobs = async () => {
+    const { page, search, searchStatus, searchType, sort } = state;
+
+    let url = `/jobs?page=${page}&status=${searchStatus}&jobType=${searchType}&sort=${sort}`;
+    if (search) {
+      url = url + `&search=${search}`;
+    }
+    dispatch({ type: actionTypes.GET_JOBS_BEGIN });
+
+    try {
+      const { data } = await authFetch(url);
+      const { jobs, totalJobs, numOfPages } = data;
+      dispatch({
+        type: actionTypes.GET_JOBS_SUCCESS,
+        payload: {
+          jobs,
+          totalJobs,
+          numOfPages,
+        },
+      });
+    } catch (error) {
+      logoutUser();
+    }
+    clearAlert();
+  };
+
+  const setEditJob = (id: string) => {
+    dispatch({ type: actionTypes.SET_EDIT_JOB, payload: id });
+  };
+
+  const editJob = async () => {
+    dispatch({ type: actionTypes.EDIT_JOB_BEGIN });
+    try {
+      const {
+        position,
+        company,
+        jobLocation,
+        jobType,
+        status,
+        editJobId,
+      } = state;
+      await authFetch.patch(`/jobs/${editJobId}`, {
+        position,
+        company,
+        jobLocation,
+        jobType,
+        status,
+      });
+      dispatch({ type: actionTypes.EDIT_JOB_SUCCESS });
+      dispatch({ type: actionTypes.CLEAR_VALUES });
+    } catch (error) {
+      if (error.response.status === 401) return;
+      dispatch({
+        type: actionTypes.EDIT_JOB_ERROR,
+        payload: { message: error.response.data.message },
+      });
+    }
+    clearAlert();
+  };
+
+  const deleteJob = async (jobId: string) => {
+    dispatch({ type: actionTypes.DELETE_JOB_BEGIN, payload: jobId });
+    try {
+      await authFetch.delete(`/jobs/${jobId}`);
+      dispatch({ type: actionTypes.DELETE_JOB_END });
+    } catch (error) {
+      console.log("Delete job error: ", error);
+      logoutUser();
+    }
+  };
+
+  const showStats = async () => {
+    dispatch({ type: actionTypes.SHOW_STATS_BEGIN });
+    try {
+      const { data } = await authFetch("/jobs/stats");
+      dispatch({
+        type: actionTypes.SHOW_STATS_SUCCESS,
+        payload: {
+          stats: data.defaultStats,
+          monthlyApplications: data.monthlyApplications,
+        },
+      });
+    } catch (error) {
+      logoutUser();
+    }
+    clearAlert();
+  };
+
+  const clearFilters = () => {
+    dispatch({ type: actionTypes.CLEAR_FILTERS });
+  };
+
+  const changePage = (page: number) => {
+    dispatch({ type: actionTypes.CHANGE_PAGE, payload: { page } });
   };
 
   return (
@@ -215,6 +318,13 @@ const AppProvider = ({ children }: AppContextProps) => {
         handleChange,
         clearValues,
         createJob,
+        getJobs,
+        setEditJob,
+        editJob,
+        deleteJob,
+        showStats,
+        clearFilters,
+        changePage,
       }}
     >
       {children}
