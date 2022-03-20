@@ -1,5 +1,5 @@
 import { ReducerAction } from "../models";
-import actionTypes from "../actionTypes/confirmActionTypes";
+import actionTypes from "../actionTypes/layoutActionTypes";
 
 export interface ConfirmContextState {
   show: boolean;

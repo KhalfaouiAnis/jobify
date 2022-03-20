@@ -1,14 +1,19 @@
 import { ReducerAction, AppContextState } from "./models";
-import actionTypes from "./actionTypes";
 
 import { initialState } from "./appContext";
 import JobInterface from "../interfaces/JobInterface";
+import {
+  layoutActionTypes,
+  jobActionTypes,
+  appActionTypes,
+  statisticsActionTypes,
+} from "./actionTypes";
 
 const reducer = (
   state: AppContextState,
   action: ReducerAction
 ): AppContextState => {
-  if (action.type === actionTypes.DISPLAY_ALERT) {
+  if (action.type === layoutActionTypes.DISPLAY_ALERT) {
     return {
       ...state,
       showAlert: true,
@@ -16,7 +21,7 @@ const reducer = (
       alertText: "Please provide all values",
     };
   }
-  if (action.type === actionTypes.CLEAR_ALERT) {
+  if (action.type === layoutActionTypes.CLEAR_ALERT) {
     return {
       ...state,
       showAlert: false,
@@ -25,17 +30,17 @@ const reducer = (
     };
   }
   if (
-    action.type === actionTypes.AUTH_USER_BEGIN ||
-    action.type === actionTypes.UPDATE_USER_BEGIN ||
-    action.type === actionTypes.EDIT_JOB_BEGIN ||
-    action.type === actionTypes.CREATE_JOB_BEGIN
+    action.type === appActionTypes.AUTH_USER_BEGIN ||
+    action.type === appActionTypes.UPDATE_USER_BEGIN ||
+    action.type === jobActionTypes.EDIT_JOB_BEGIN ||
+    action.type === jobActionTypes.CREATE_JOB_BEGIN
   ) {
     return {
       ...state,
       isLoading: true,
     };
   }
-  if (action.type === actionTypes.AUTH_USER_SUCCESS) {
+  if (action.type === appActionTypes.AUTH_USER_SUCCESS) {
     return {
       ...state,
       isLoading: false,
@@ -49,8 +54,8 @@ const reducer = (
     };
   }
   if (
-    action.type === actionTypes.AUTH_USER_ERROR ||
-    action.type === actionTypes.UPDATE_USER_ERROR
+    action.type === appActionTypes.AUTH_USER_ERROR ||
+    action.type === appActionTypes.UPDATE_USER_ERROR
   ) {
     return {
       ...state,
@@ -60,13 +65,13 @@ const reducer = (
       alertText: action.payload.message,
     };
   }
-  if (action.type === actionTypes.TOGGLE_SIDEBAR) {
+  if (action.type === layoutActionTypes.TOGGLE_SIDEBAR) {
     return {
       ...state,
       showSidebar: !state.showSidebar,
     };
   }
-  if (action.type === actionTypes.LOGOUT_USER) {
+  if (action.type === appActionTypes.LOGOUT_USER) {
     return {
       ...initialState,
       user: null,
@@ -77,7 +82,7 @@ const reducer = (
     };
   }
 
-  if (action.type === actionTypes.UPDATE_USER_SUCCESS) {
+  if (action.type === appActionTypes.UPDATE_USER_SUCCESS) {
     return {
       ...state,
       isLoading: false,
@@ -91,7 +96,7 @@ const reducer = (
     };
   }
 
-  if (action.type === actionTypes.UPDATE_USER_ERROR) {
+  if (action.type === appActionTypes.UPDATE_USER_ERROR) {
     return {
       ...state,
       isLoading: false,
@@ -101,14 +106,14 @@ const reducer = (
     };
   }
 
-  if (action.type === actionTypes.HANDLE_CHANGE) {
+  if (action.type === layoutActionTypes.HANDLE_CHANGE) {
     return {
       ...state,
       [action.payload.name]: action.payload.value,
     };
   }
 
-  if (action.type === actionTypes.CLEAR_VALUES) {
+  if (action.type === layoutActionTypes.CLEAR_VALUES) {
     const initialState = {
       isEditing: false,
       editJobId: "",
@@ -124,7 +129,7 @@ const reducer = (
     };
   }
 
-  if (action.type === actionTypes.CREATE_JOB_SUCCESS) {
+  if (action.type === jobActionTypes.CREATE_JOB_SUCCESS) {
     return {
       ...state,
       isLoading: false,
@@ -135,8 +140,8 @@ const reducer = (
   }
 
   if (
-    action.type === actionTypes.CREATE_JOB_ERROR ||
-    action.type === actionTypes.EDIT_JOB_ERROR
+    action.type === jobActionTypes.CREATE_JOB_ERROR ||
+    action.type === jobActionTypes.EDIT_JOB_ERROR
   ) {
     return {
       ...state,
@@ -147,11 +152,11 @@ const reducer = (
     };
   }
 
-  if (action.type === actionTypes.GET_JOBS_BEGIN) {
+  if (action.type === jobActionTypes.GET_JOBS_BEGIN) {
     return { ...state, isLoading: true, showAlert: false };
   }
 
-  if (action.type === actionTypes.GET_JOBS_SUCCESS) {
+  if (action.type === jobActionTypes.GET_JOBS_SUCCESS) {
     return {
       ...state,
       isLoading: false,
@@ -161,7 +166,7 @@ const reducer = (
     };
   }
 
-  if (action.type === actionTypes.SET_EDIT_JOB) {
+  if (action.type === jobActionTypes.SET_EDIT_JOB) {
     const job: JobInterface = state.jobs.find(
       (job) => job._id === action.payload
     );
@@ -178,7 +183,7 @@ const reducer = (
     };
   }
 
-  if (action.type === actionTypes.EDIT_JOB_SUCCESS) {
+  if (action.type === jobActionTypes.EDIT_JOB_SUCCESS) {
     return {
       ...state,
       isLoading: false,
@@ -188,7 +193,7 @@ const reducer = (
     };
   }
 
-  if (action.type === actionTypes.DELETE_JOB_BEGIN) {
+  if (action.type === jobActionTypes.DELETE_JOB_BEGIN) {
     return {
       ...state,
       isLoading: true,
@@ -196,39 +201,27 @@ const reducer = (
     };
   }
 
-  if (action.type === actionTypes.DELETE_JOB_END) {
+  if (action.type === jobActionTypes.DELETE_JOB_END) {
     return {
       ...state,
       isLoading: false,
     };
   }
 
-  if (action.type === actionTypes.SHOW_STATS_BEGIN) {
+  if (action.type === statisticsActionTypes.SHOW_STATS_BEGIN) {
     return {
       ...state,
       isLoading: true,
       showAlert: false,
     };
   }
-  if (action.type === actionTypes.SHOW_STATS_SUCCESS) {
+  if (action.type === statisticsActionTypes.SHOW_STATS_SUCCESS) {
     return {
       ...state,
       isLoading: false,
       stats: action.payload.stats,
       monthlyApplications: action.payload.monthlyApplications,
     };
-  }
-  if (action.type === actionTypes.CLEAR_FILTERS) {
-    return {
-      ...state,
-      search: "",
-      searchStatus: "all",
-      searchType: "all",
-      sort: "latest",
-    };
-  }
-  if (action.type === actionTypes.CHANGE_PAGE) {
-    return { ...state, page: action.payload.page };
   }
 
   throw new Error(`No such action: ${action.type}`);

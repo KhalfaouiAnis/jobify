@@ -1,5 +1,5 @@
-import { useConfirmContext, ConfirmContext } from "../context/confirmContext";
-import actionTypes from "../context/actionTypes/confirmActionTypes";
+import { ConfirmContext } from "../context/confirmContext";
+import actionTypes from "../context/actionTypes/layoutActionTypes";
 import { useContext } from "react";
 
 let resolveCallback: any;
