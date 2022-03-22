@@ -12,8 +12,8 @@ export const saveUserToLocalStorage = ({
   location,
 }: SUTLSrops) => {
   localStorage.setItem("user", JSON.stringify(user));
-  localStorage.setItem("token", JSON.stringify(token));
-  localStorage.setItem("location", JSON.stringify(location));
+  localStorage.setItem("token", token);
+  localStorage.setItem("location", location);
 };
 
 export const removeUserFromLocalStorage = () => {

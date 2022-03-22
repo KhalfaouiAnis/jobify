@@ -16,18 +16,45 @@ export interface AppContextState {
   user: User | null | undefined;
   token: string | null;
   userLocation: string;
-  jobLocation: string;
+  jobLocation?: string;
   showSidebar: boolean;
 
   //job context
-  isEditing: boolean;
-  editJobId: string;
-  position: string;
-  company: string;
+  isEditing?: boolean;
+  editJobId?: string;
+  position?: string;
+  company?: string;
   jobTypeOptions: ["full-time", "part-time", "remote", "internship"];
-  jobType: "full-time" | string;
+  jobType?: "full-time" | string;
   statusOptions: ["interview", "declined", "pending", "approuved"];
-  status: "pending" | string;
+  status?: "pending" | string;
+  jobs: any[];
+  totalJobs: number;
+  numOfPages: number;
+  page: number;
+
+  getJobs(): any;
+  setEditJob(id: string): any;
+  editJob(): any;
+  deleteJob(id: string): any;
+
+  // Search and Sort
+  search: string;
+  searchStatus: string;
+  searchType: string;
+  sort: string;
+  sortOptions: string[];
+  clearFilters(): any;
+
+  // Stats
+  stats: {
+    pending?: number;
+    interview?: number;
+    declined?: number;
+  };
+  monthlyApplications: [];
+
+  showStats(): any;
 
   handleChange(obj: HCProps): any;
   clearValues(): any;

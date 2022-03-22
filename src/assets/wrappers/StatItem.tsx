@@ -1,6 +1,7 @@
-import styled from 'styled-components'
+import styled from "styled-components";
+import StatItemProps from "../../interfaces/StatItemProps";
 
-const Wrapper = styled.article`
+const Wrapper = styled.article<StatItemProps>`
   padding: 2rem;
   background: var(--white);
   border-radius: var(--borderRadius);
@@ -36,6 +37,6 @@ const Wrapper = styled.article`
       color: ${(props) => props.color};
     }
   }
-`
+`;
 
-export default Wrapper
+export default Wrapper;

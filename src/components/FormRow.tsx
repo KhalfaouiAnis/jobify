@@ -4,7 +4,7 @@ interface formRowProps {
   type?: string;
   name?: string;
   value?: string | number;
-  handleChange?(e: React.SyntheticEvent): any;
+  handleChange?(e?: React.SyntheticEvent): any;
   labelText?: string;
 }
 

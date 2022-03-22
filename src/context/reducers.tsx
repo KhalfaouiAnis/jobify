@@ -1,4 +1,7 @@
 import { ReducerAction, AppContextState } from "./models";
+import { initialState } from "./appContext";
+import JobInterface from "../interfaces/JobInterface";
+
 import {
   DISPLAY_ALERT,
   CLEAR_ALERT,
@@ -15,9 +18,18 @@ import {
   CREATE_JOB_BEGIN,
   CREATE_JOB_SUCCESS,
   CREATE_JOB_ERROR,
+  EDIT_JOB_BEGIN,
+  EDIT_JOB_SUCCESS,
+  EDIT_JOB_ERROR,
+  GET_JOBS_BEGIN,
+  GET_JOBS_SUCCESS,
+  SET_EDIT_JOB,
+  DELETE_JOB_END,
+  DELETE_JOB_BEGIN,
+  SHOW_STATS_BEGIN,
+  SHOW_STATS_SUCCESS,
+  CLEAR_FILTERS,
 } from "./actions";
-
-import { initialState } from "./appContext";
 
 const reducer = (
   state: AppContextState,
@@ -31,6 +43,7 @@ const reducer = (
       alertText: "Please provide all values",
     };
   }
+
   if (action.type === CLEAR_ALERT) {
     return {
       ...state,
@@ -39,12 +52,19 @@ const reducer = (
       alertText: "",
     };
   }
-  if (action.type === AUTH_USER_BEGIN || action.type === UPDATE_USER_BEGIN) {
+
+  if (
+    action.type === AUTH_USER_BEGIN ||
+    action.type === UPDATE_USER_BEGIN ||
+    action.type === EDIT_JOB_BEGIN ||
+    action.type === CREATE_JOB_BEGIN
+  ) {
     return {
       ...state,
       isLoading: true,
     };
   }
+
   if (action.type === AUTH_USER_SUCCESS) {
     return {
       ...state,
@@ -58,21 +78,14 @@ const reducer = (
       alertText: action.payload.alertText,
     };
   }
-  if (action.type === AUTH_USER_ERROR || action.type === UPDATE_USER_ERROR) {
-    return {
-      ...state,
-      isLoading: false,
-      showAlert: true,
-      alertType: "danger",
-      alertText: action.payload.message,
-    };
-  }
+
   if (action.type === TOGGLE_SIDEBAR) {
     return {
       ...state,
       showSidebar: !state.showSidebar,
     };
   }
+
   if (action.type === LOGOUT_USER) {
     return {
       ...initialState,
@@ -81,13 +94,6 @@ const reducer = (
       jobLocation: "",
       userLocation: "",
       showSidebar: !state.showSidebar,
-    };
-  }
-
-  if (action.type === UPDATE_USER_BEGIN) {
-    return {
-      ...state,
-      isLoading: true,
     };
   }
 
@@ -102,16 +108,6 @@ const reducer = (
       showAlert: true,
       alertType: "success",
       alertText: "User profile updated",
-    };
-  }
-
-  if (action.type === UPDATE_USER_ERROR) {
-    return {
-      ...state,
-      isLoading: false,
-      showAlert: true,
-      alertType: "danger",
-      alertText: action.payload.message,
     };
   }
 
@@ -138,13 +134,6 @@ const reducer = (
     };
   }
 
-  if (action.type === CREATE_JOB_BEGIN) {
-    return {
-      ...state,
-      isLoading: true,
-    };
-  }
-
   if (action.type === CREATE_JOB_SUCCESS) {
     return {
       ...state,
@@ -155,7 +144,12 @@ const reducer = (
     };
   }
 
-  if (action.type === CREATE_JOB_ERROR) {
+  if (
+    action.type === CREATE_JOB_ERROR ||
+    action.type === UPDATE_USER_ERROR ||
+    action.type === EDIT_JOB_ERROR ||
+    action.type === AUTH_USER_ERROR
+  ) {
     return {
       ...state,
       isLoading: false,
@@ -164,6 +158,94 @@ const reducer = (
       alertText: action.payload.message,
     };
   }
+
+  if (action.type === GET_JOBS_BEGIN) {
+    return { ...state, isLoading: true, showAlert: false };
+  }
+
+  if (action.type === GET_JOBS_SUCCESS) {
+    return {
+      ...state,
+      isLoading: false,
+      jobs: action.payload.jobs,
+      totalJobs: action.payload.totalJobs,
+      numOfPages: action.payload.numOfPages,
+    };
+  }
+
+  if (action.type === DELETE_JOB_BEGIN) {
+    return {
+      ...state,
+      isLoading: true,
+      jobs: state.jobs.filter((job) => job._id !== action.payload),
+    };
+  }
+
+  if (action.type === DELETE_JOB_END) {
+    return {
+      ...state,
+      isLoading: false,
+    };
+  }
+
+  if (action.type === SET_EDIT_JOB) {
+    const job: JobInterface = state.jobs.find(
+      (job) => job._id === action.payload
+    );
+
+    if (job) {
+      const { _id, position, company, jobLocation, jobType, status } = job;
+      return {
+        ...state,
+        isEditing: true,
+        editJobId: _id,
+        position,
+        company,
+        jobLocation,
+        jobType,
+        status,
+      };
+    }
+    return { ...state };
+  }
+
+  if (action.type === EDIT_JOB_SUCCESS) {
+    return {
+      ...state,
+      isLoading: false,
+      showAlert: true,
+      alertType: "success",
+      alertText: "Job Updated!",
+    };
+  }
+
+  if (action.type === SHOW_STATS_BEGIN) {
+    return {
+      ...state,
+      isLoading: true,
+      showAlert: false,
+    };
+  }
+
+  if (action.type === SHOW_STATS_SUCCESS) {
+    return {
+      ...state,
+      isLoading: false,
+      stats: action.payload.stats,
+      monthlyApplications: action.payload.monthlyApplications,
+    };
+  }
+
+  if (action.type === CLEAR_FILTERS) {
+    return {
+      ...state,
+      search: "",
+      searchStatus: "all",
+      searchType: "all",
+      sort: "latest",
+    };
+  }
+
   throw new Error(`No such action: ${action.type}`);
 };
 
