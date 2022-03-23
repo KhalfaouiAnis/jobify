@@ -1,16 +1,20 @@
-import React, { Fragment, useEffect } from "react";
+import React, { Fragment, useEffect, useCallback } from "react";
 import { useAppContext } from "../../context/appContext";
 import { Loading, StatsContainer, ChartsContainer } from "../../components";
 
 const Stats = () => {
   const { showStats, isLoading, monthlyApplications } = useAppContext();
 
+  const fetchStatsData = useCallback(() => showStats(), []);
+
   useEffect(() => {
-    showStats();
-  }, []);
+    fetchStatsData();
+  }, [fetchStatsData]);
+
   if (isLoading) {
     return <Loading center />;
   }
+
   return (
     <Fragment>
       <StatsContainer />

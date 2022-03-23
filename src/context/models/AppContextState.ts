@@ -32,6 +32,7 @@ export interface AppContextState {
   totalJobs: number;
   numOfPages: number;
   page: number;
+  changePage(page: number): any;
 
   getJobs(): any;
   setEditJob(id: string): any;

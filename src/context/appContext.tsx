@@ -34,6 +34,7 @@ import {
   SHOW_STATS_BEGIN,
   SHOW_STATS_SUCCESS,
   CLEAR_FILTERS,
+  CHANGE_PAGE,
 } from "./actions";
 import { API_VERSION } from "../shared/url";
 import Auth from "../interfaces/Auth";
@@ -74,6 +75,7 @@ const initialState: AppContextState = {
   totalJobs: 0,
   numOfPages: 1,
   page: 1,
+  changePage: () => {},
 
   // Search & Sort jobs
   search: "",
@@ -244,9 +246,9 @@ const AppProvider = ({ children }: AppContextProps) => {
   };
 
   const getJobs = async () => {
-    const { search, searchStatus, searchType, sort } = state;
+    const { search, searchStatus, searchType, sort, page } = state;
 
-    let url = `/jobs?status=${searchStatus}&jobType=${searchType}&sort=${sort}`;
+    let url = `/jobs?page=${page}&status=${searchStatus}&jobType=${searchType}&sort=${sort}`;
 
     if (search) {
       url = url + `&search=${search}`;
@@ -340,6 +342,10 @@ const AppProvider = ({ children }: AppContextProps) => {
     dispatch({ type: CLEAR_FILTERS });
   };
 
+  const changePage = (page: number) => {
+    dispatch({ type: CHANGE_PAGE, payload: { page } });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -358,6 +364,7 @@ const AppProvider = ({ children }: AppContextProps) => {
         deleteJob,
         showStats,
         clearFilters,
+        changePage,
       }}
     >
       {children}

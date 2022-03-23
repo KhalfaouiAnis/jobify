@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import Loading from "./Loading";
 import Job from "../Job";
 import Wrapper from "../../assets/wrappers/JobsContainer";
 import { useAppContext } from "../../context/appContext";
+import PageBtnContainer from "../pagination/PageBtnContainer";
 
 const JobsContainer = () => {
   const {
@@ -14,12 +15,21 @@ const JobsContainer = () => {
     searchStatus,
     searchType,
     sort,
+    numOfPages,
+    page,
   } = useAppContext();
 
+  const fetchStatsData = useCallback(() => getJobs(), [
+    search,
+    searchStatus,
+    searchType,
+    sort,
+    page,
+  ]);
+
   useEffect(() => {
-    getJobs();
-    // eslint-disable-next-line
-  }, [search, searchStatus, searchType, sort]);
+    fetchStatsData();
+  }, [fetchStatsData]);
 
   if (isLoading) {
     return <Loading center />;
@@ -43,7 +53,7 @@ const JobsContainer = () => {
           return <Job key={job._id} {...job} />;
         })}
       </div>
-      {/* pagination btns */}
+      {numOfPages > 1 && <PageBtnContainer />}
     </Wrapper>
   );
 };
